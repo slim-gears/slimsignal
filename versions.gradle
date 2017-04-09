@@ -8,4 +8,6 @@ ext {
     streamsupportVersion = '1.4.2'
     slimAptVersion = '0.1.10'
     jsr250ApiVersion = '1.0'
+    mockitoVersion = '2.7.22'
+    reactivexVersion = '2.0.8'
 }

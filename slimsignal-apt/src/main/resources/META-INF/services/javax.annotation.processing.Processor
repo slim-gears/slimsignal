@@ -1,0 +1,3 @@
+com.slimgears.slimsignal.apt.GenerateEntityAnnotationProcessor
+com.slimgears.slimsignal.apt.EntityAnnotationProcessor
+com.slimgears.slimsignal.apt.RepositoryAnnotationProcessor

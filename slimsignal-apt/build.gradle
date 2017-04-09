@@ -1,0 +1,16 @@
+import org.gradle.internal.jvm.Jvm
+
+apply plugin: 'java-lib-aio'
+apply plugin: 'publishing-aio'
+
+dependencies {
+    compile "com.github.slim-gears:slimapt:$slimAptVersion"
+    compile project(':slimsignal-core')
+    
+    testCompile project(path: ':slimsignal-core', configuration: 'testOutput')
+    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVersion"
+    testCompile "com.google.truth:truth:$googleTruthVersion"
+    testCompile "com.github.slim-gears:slimapt:$slimAptVersion:tests"
+
+    testCompile files(Jvm.current().getToolsJar())
+}

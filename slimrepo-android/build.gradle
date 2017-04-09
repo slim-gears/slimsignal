@@ -1,7 +1,0 @@
-apply plugin: 'android-lib-aio'
-apply plugin: 'publishing-aio'
-
-dependencies {
-    compile project(':slimrepo-core')
-    testCompile project(path: ':slimrepo-core', configuration: 'testOutput')
-}
