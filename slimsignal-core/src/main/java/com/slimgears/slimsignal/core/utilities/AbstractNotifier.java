@@ -1,5 +1,7 @@
 package com.slimgears.slimsignal.core.utilities;
 
+import com.slimgears.slimsignal.core.interfaces.Subscription;
+
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -10,8 +12,9 @@ public abstract class AbstractNotifier<S> implements Notifier<S> {
     private final RecursionGuard recursionGuard = new RecursionGuard();
     protected abstract Stream<S> subscribers();
 
-    protected void register(S subscriber) {
-        Subscriptions.current().add(subscriber, this::unsubscribe);
+    protected Subscription register(Subscription subscription) {
+        Subscriptions.current().add(subscription);
+        return subscription;
     }
 
     @Override

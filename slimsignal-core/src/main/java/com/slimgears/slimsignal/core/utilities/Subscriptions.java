@@ -1,9 +1,10 @@
 package com.slimgears.slimsignal.core.utilities;
 
+import com.slimgears.slimsignal.core.interfaces.Subscription;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Created by itskod on 06/04/2017.
@@ -12,7 +13,7 @@ public abstract class Subscriptions {
     private final static ThreadLocal<SubscriptionStore> CURRENT_THREAD_SUBSCRIPTIONS = new ThreadLocal<>();
 
     interface SubscriptionStore extends AutoCloseable {
-        <S> void add(S subscription, Consumer<S> unsubscriber);
+        void add(Subscription subscription);
     }
 
     public static SubscriptionStore current() {
@@ -39,11 +40,10 @@ public abstract class Subscriptions {
         }
     }
 
-    public abstract void unsubscribe();
     public abstract AutoCloseable subscribe();
 
     static class InternalSubscriber extends Subscriptions implements SubscriptionStore {
-        private final List<Runnable> unsubscribers = new LinkedList<>();
+        private final List<Subscription> subscriptions = new LinkedList<>();
 
         @Override
         public AutoCloseable subscribe() {
@@ -52,18 +52,13 @@ public abstract class Subscriptions {
         }
 
         @Override
-        public void unsubscribe() {
-            unsubscribers.forEach(Runnable::run);
-        }
-
-        @Override
-        public <S> void add(S subscription, Consumer<S> unsubscriber) {
-            unsubscribers.add(() -> unsubscriber.accept(subscription));
+        public void add(Subscription subscription) {
+            subscriptions.add(subscription);
         }
 
         @Override
         public void close() throws Exception {
-            unsubscribe();
+            subscriptions.forEach(Subscription::unsubscribe);
         }
     }
 

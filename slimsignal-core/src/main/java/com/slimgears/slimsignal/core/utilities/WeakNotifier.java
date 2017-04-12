@@ -1,5 +1,7 @@
 package com.slimgears.slimsignal.core.utilities;
 
+import com.slimgears.slimsignal.core.interfaces.Subscription;
+
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -10,13 +12,12 @@ public class WeakNotifier<S> extends AbstractNotifier<S> {
     private final Collection<S> subscribers = new WeakCollection<>();
 
     @Override
-    public void subscribe(S subscriber) {
+    public Subscription subscribe(S subscriber) {
         subscribers.add(subscriber);
-        register(subscriber);
+        return register(() -> unsubscribe(subscriber));
     }
 
-    @Override
-    public void unsubscribe(S subscriber) {
+    private void unsubscribe(S subscriber) {
         subscribers.add(subscriber);
     }
 

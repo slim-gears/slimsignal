@@ -1,82 +1,53 @@
 package com.slimgears.slimsignal.core;
 
-import com.slimgears.slimsignal.core.interfaces.*;
-import com.slimgears.slimsignal.core.internal.*;
+import com.slimgears.slimsignal.core.interfaces.Observable;
+import com.slimgears.slimsignal.core.interfaces.Signal;
+import com.slimgears.slimsignal.core.internal.DefaultSignal;
+import com.slimgears.slimsignal.core.internal.DistinctSignal;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * Created by denis on 4/7/2017.
+ * Created by denis on 4/9/2017.
  */
 public class Signals {
     public static <T> Signal<T> create() {
-        return new InternalSignal<>();
+        return new DefaultSignal<>();
     }
 
-    public static <T> Signal<T> create(Consumer<T> subscriber) {
-        Signal<T> signal = new InternalSignal<>();
-        signal.subscribe(subscriber);
+    public static <T> Signal<T> createDistinct() {
+        return new DistinctSignal<>();
+    }
+
+    public static <T> Signal<T> toDistinctSignal(Observable<T> observable) {
+        if (observable instanceof DistinctSignal) {
+            return (DistinctSignal<T>)observable;
+        }
+
+        Signal<T> signal = createDistinct();
+        observable.subscribe(signal::publish);
         return signal;
     }
 
-    public static Trigger triggerForAny(Signal... signals) {
-        Trigger trigger = Triggers.create();
-        Consumer subscriber = obj -> trigger.trigger();
+    public static <T> Signal<T> toSignal(Observable<T> observable) {
+        if (observable instanceof Signal) {
+            return (Signal<T>)observable;
+        } else {
+            Signal<T> signal = create();
+            observable.subscribe(signal::publish);
+            return signal;
+        }
+    }
+
+    @SafeVarargs
+    public static <T> Signal<T>[] toSignals(Observable<T>... observables) {
         //noinspection unchecked
-        Stream.of(signals).forEach(signal -> signal.subscribe(subscriber));
-        return trigger;
+        return Stream.of(observables).map(Signals::toSignal).toArray(Signal[]::new);
     }
 
-    public static <T> CollectionSignal<T> collection() {
-        return new InternalCollectionSignal<>();
-    }
-
-    public static BoolSignal boolSignal() {
-        return new InternalBoolSignal();
-    }
-
-    public static BoolSignal of(boolean value) {
-        return fromConstant(Signals::boolSignal, value);
-    }
-
-    public static IntSignal intSignal() {
-        return new InternalIntSignal();
-    }
-
-
-    public static IntSignal of(int value) {
-        return fromConstant(Signals::intSignal, value);
-    }
-
-    public static LongSignal longSignal() {
-        return new InternalLongSignal();
-    }
-
-    public static LongSignal of(long value) {
-        return fromConstant(Signals::longSignal, value);
-    }
-
-    public static DoubleSignal doubleSignal() {
-        return new InternalDoubleSignal();
-    }
-
-    public static DoubleSignal of(double value) {
-        return fromConstant(Signals::doubleSignal, value);
-    }
-
-    public static FloatSignal floatSignal() {
-        return new InternalFloatSignal();
-    }
-
-    public static FloatSignal of(float value) {
-        return fromConstant(Signals::floatSignal, value);
-    }
-
-    private static <T, S extends Signal<T>> S fromConstant(Supplier<S> signalSupplier, T value) {
-        S signal = signalSupplier.get();
-        signal.publish(value);
-        return signal;
+    @SafeVarargs
+    public static <T> Signal<T>[] toDistinctSignals(Observable<T>... observables) {
+        //noinspection unchecked
+        return Stream.of(observables).map(Signals::toDistinctSignal).toArray(Signal[]::new);
     }
 }

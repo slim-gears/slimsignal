@@ -1,9 +1,8 @@
 package com.slimgears.slimsignal.core;
 
 import com.slimgears.slimsignal.core.interfaces.Trigger;
-import com.slimgears.slimsignal.core.internal.InternalTrigger;
+import com.slimgears.slimsignal.core.internal.DefaultTrigger;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -11,11 +10,11 @@ import java.util.stream.Stream;
  */
 public class Triggers {
     public static Trigger create() {
-        return new InternalTrigger();
+        return new DefaultTrigger();
     }
 
     public static Trigger forAny(Trigger... triggers) {
-        Trigger newTrigger = create();
+        DefaultTrigger newTrigger = new DefaultTrigger();
         Stream.of(triggers).forEach(t -> t.subscribe(newTrigger::trigger));
         return newTrigger;
     }
